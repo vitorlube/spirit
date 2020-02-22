@@ -3,14 +3,8 @@ all:
   vars:
     ansible_connection: ssh
     ansible_user: root
-    ansible_ssh_pass: N45pp1p@
-    ansible_become_pass: N45pp1p@
-    # ansible_host_key_checking: False
-    #ansible_python_interpreter: /usr/bin/python3
 
     vc_server: vcenter.vip.lab
-    vc_user: administrator@vsphere.local
-    vc_pass: ironN45pp1p@@
     vc_dc: VIP_LAB
     vc_cluster: ClusterTEST1
     vc_folder: /vm/Infra
@@ -23,7 +17,6 @@ all:
     vm_dns: 10.100.1.1
     vm_dnssearch: vip.lab
     vm_username: root
-    vm_password: N45pp1p@
     vc_template: Template-CentOS7-1810
 
   children:
