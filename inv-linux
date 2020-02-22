@@ -1,144 +1,37 @@
 ---
-- hosts: all
-  connection: local
-  gather_facts: false
-  # ver o que eh
-  # strategy: free
+all:
+  vars:
+    ansible_connection: ssh
+    ansible_user: root
+    ansible_ssh_pass: N45pp1p@
+    ansible_become_pass: N45pp1p@
+    # ansible_host_key_checking: False
+    #ansible_python_interpreter: /usr/bin/python3
 
-  tasks:
-  - name: Create VM from a template
-    vmware_guest:
-      hostname: "{{vc_server}}"
-      username: "{{vc_user}}"
-      password: "{{vc_pass}}"
-      validate_certs: no
-      name: "{{inventory_hostname}}"
-      state: poweredon
-      template: "{{vc_template}}"
-      datacenter: "{{vc_dc}}"
-      folder: "{{vc_folder}}"
-      esxi_hostname: "{{vc_esxi}}"
-      networks:
-      - name: "{{vc_net}}"
-        ip: "{{vm_ip}}"
-        netmask: "{{vm_netmask}}"
-        gateway: "{{vm_gw}}"
-      disk:
-      - size_gb: "{{vm_disk_gb}}"
-        type: thin
-        datastore: "{{vc_ds}}"
-      hardware:
-        memory_mb: "{{vm_mem_mb}}"
-        num_cpus: "{{vm_cpu}}"
-        scsi: lsilogic
-      customization:
-        hostname: "{{inventory_hostname}}"
-        timezone: America/Sao_Paulo
-        dns_servers: "{{vm_dns}}"
-        dns_suffix: "{{vm_dnssearch}}"
-      wait_for_customization: yes
-    delegate_to: localhost
-    register: deploy
+    vc_server: vcenter.vip.lab
+    vc_user: administrator@vsphere.local
+    vc_pass: ironN45pp1p@@
+    vc_dc: VIP_LAB
+    vc_cluster: ClusterTEST1
+    vc_folder: /vm/Infra
+    vc_esxi: vmwtest2.vip.lab
+    vc_net: LAN.vip.lab2
+    vc_ds: TEST2_SSD_RAID-0
 
-  - name: Wait for VMware tools to become available
-    vmware_guest_tools_wait:
-      hostname: "{{vc_server}}"
-      username: "{{vc_user}}"
-      password: "{{vc_pass}}"
-      validate_certs: no
-      name: "{{inventory_hostname}}"
-    delegate_to: localhost
+    vm_netmask: 255.255.255.0
+    vm_gw: 10.100.1.1
+    vm_dns: 10.100.1.1
+    vm_dnssearch: vip.lab
+    vm_username: root
+    vm_password: N45pp1p@
+    vc_template: Template-CentOS7-1810
 
-  # - name: Reboot guest machine
-  #   vmware_vm_shell:
-  #     hostname: "{{vc_server}}"
-  #     username: "{{vc_user}}"
-  #     password: "{{vc_pass}}"
-  #     validate_certs: no
-  #     datacenter: "{{vc_dc}}"
-  #     folder: "{{vc_folder}}"
-  #     vm_id: "{{inventory_hostname}}"
-  #     vm_username: "{{vm_username}}"
-  #     vm_password: "{{vm_password}}"
-  #     vm_shell: "/sbin/shutdown"
-  #     vm_shell_args: "-r now"
-  #   delegate_to: localhost
-
-  # - name: install packages
-  #   yum:
-  #     name: "{{packages}}"
-  #   vars:
-  #     packages:
-  #     - python3
-  #     - openssh
-  #     - openssh-server
-  #     - postgresql-server
-  #     - postgresql-contrib
-  #     - rabbitmq-server
-  #     - wget
-  #     - memcached
-  #     - nginx
-  #     - epel-release
-  #     - ansible
-  #   # wait_for_procces: yes  
-  #   tags:
-  #   - packages
-
-  # - name: postgreSQL repository
-  #   yum_repository:
-  #     baseurl: https://download.postgresql.org/pub/repos/yum/9.6/redhat/rhel-7-x86_64/pgdg-centos96-9.6-3.noarch.rpm
-  #     tags:
-  #     - postgrerepo
-
-  # - name: Download awx-repo
-  #   get_url:
-  #     url: https://copr.fedorainfracloud.org/coprs/mrmeee/awx/repo/epel-7/mrmeee-awx-epel-7.repo
-  #     dest: /etc/yum.repos.d/awx-rpm.repo
-  #   tags:
-  #   - downloadrepo
-
-  # - name: Adiciona servico http e https no firewalld
-  #   vmware_vm_shell:
-  #     hostname: "{{vc_server}}"
-  #     username: "{{vc_user}}"
-  #     password: "{{vc_pass}}"
-  #     validate_certs: no
-  #     datacenter: "{{vc_dc}}"
-  #     folder: "{{vc_folder}}"
-  #     vm_id: "{{inventory_hostname}}"
-  #     vm_username: "{{vm_username}}"
-  #     vm_password: "{{vm_password}}"
-  #     vm_shell: "/usr/bin/firewall-cmd"
-  #     vm_shell_args: '{{item}}' 
-  #   with_items:
-  #    - --add-service=http --permanent 
-  #    - --add-service=https --permanent
-  #   delegate_to: localhost
-  #   tags: firewall_rule
-
-  # - name: Habilita e reinicia servico firewalld
-  #   vmware_vm_shell:
-  #     hostname: "{{vc_server}}"
-  #     username: "{{vc_user}}"
-  #     password: "{{vc_pass}}"
-  #     validate_certs: no
-  #     datacenter: "{{vc_dc}}"
-  #     folder: "{{vc_folder}}"
-  #     vm_id: "{{inventory_hostname}}"
-  #     vm_username: "{{vm_username}}"
-  #     vm_password: "{{vm_password}}"
-  #     vm_shell: "/usr/bin/systemctl"
-  #     vm_shell_args: '{{item}}' 
-  #   with_items:
-  #       - enable firewalld
-  #       - restart firewalld
-  #   delegate_to: localhost
-  #   tags:
-  #   - firewall_enable
-
-  # - name: Instala AWX
-  #   yum:
-  #     name: awx 
-  #   # wait_to_proccess: yes  
-  #   tags:
-  #   - installawx
+  children:
+    VmList:
+      vars:
+        vm_disk_gb: 30
+        vm_mem_mb: 8192
+        vm_cpu: 4
+      hosts:
+        ansible-awx:
+          vm_ip: 10.100.1.10
